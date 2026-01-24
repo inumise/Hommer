@@ -186,12 +186,12 @@ export default function HelperPage() {
   }
 
   return (
-    <div className="min-h-screen pt-28 pb-8 px-4">
+    <div className="min-h-screen pt-24 sm:pt-28 pb-6 sm:pb-8 px-3 sm:px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           <h1 
-            className="text-3xl md:text-4xl font-bold mb-2"
+            className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2"
             style={{ 
               background: colors.gradient,
               WebkitBackgroundClip: 'text',
@@ -201,7 +201,7 @@ export default function HelperPage() {
           >
             Helper
           </h1>
-          <p style={{ color: colors.textMuted }}>
+          <p className="text-sm sm:text-base" style={{ color: colors.textMuted }}>
             Get assistance via chat, email, or phone
           </p>
         </div>

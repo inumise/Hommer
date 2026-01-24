@@ -498,12 +498,12 @@ export default function MindMapPage() {
   }
 
   return (
-    <div className="min-h-screen pt-28 pb-8 px-4">
+    <div className="min-h-screen pt-24 sm:pt-28 pb-6 sm:pb-8 px-3 sm:px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           <h1 
-            className="text-3xl md:text-4xl font-bold mb-2"
+            className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2"
             style={{ 
               background: colors.gradient,
               WebkitBackgroundClip: 'text',
@@ -513,36 +513,36 @@ export default function MindMapPage() {
           >
             Tech Architecture Builder
           </h1>
-          <p style={{ color: colors.textMuted }}>
+          <p className="text-sm sm:text-base px-2" style={{ color: colors.textMuted }}>
             Design your tech stack visually - drag, connect, and build your perfect solution
           </p>
         </div>
 
         {/* Tech Palette */}
         <div 
-          className="p-4 rounded-xl mb-4 overflow-x-auto"
+          className="p-3 sm:p-4 rounded-lg sm:rounded-xl mb-3 sm:mb-4 overflow-x-auto scrollbar-hide"
           style={{ background: colors.surface, border: `1px solid ${colors.border}` }}
         >
-          <p className="text-xs font-medium mb-3 flex items-center gap-2" style={{ color: colors.textMuted }}>
-            <Plus className="w-4 h-4" />
+          <p className="text-xs font-medium mb-2 sm:mb-3 flex items-center gap-2" style={{ color: colors.textMuted }}>
+            <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
             Click to add tech components:
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2">
             {techItems.map((tech) => {
               const Icon = tech.icon
               return (
                 <button
                   key={tech.id}
                   onClick={() => addNode(tech.id)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl transition-all hover:scale-105"
+                  className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all hover:scale-105"
                   style={{ 
                     background: `${tech.color}15`,
                     color: colors.text,
                     border: `1px solid ${tech.color}40`
                   }}
                 >
-                  <Icon className="w-4 h-4" style={{ color: tech.color }} />
-                  <span className="text-sm font-medium">{tech.name}</span>
+                  <Icon className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: tech.color }} />
+                  <span className="text-xs sm:text-sm font-medium">{tech.name}</span>
                 </button>
               )
             })}
@@ -551,13 +551,13 @@ export default function MindMapPage() {
 
         {/* Toolbar */}
         <div 
-          className="flex flex-wrap items-center justify-between gap-4 p-3 rounded-xl mb-4"
+          className="flex flex-wrap items-center justify-between gap-2 sm:gap-4 p-2 sm:p-3 rounded-lg sm:rounded-xl mb-3 sm:mb-4"
           style={{ background: colors.surface, border: `1px solid ${colors.border}` }}
         >
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <button
               onClick={undo}
-              className="p-2 rounded-lg transition-colors hover:bg-white/10"
+              className="p-1.5 sm:p-2 rounded-lg transition-colors hover:bg-white/10"
               style={{ color: historyIndex > 0 ? colors.text : colors.textMuted }}
               disabled={historyIndex <= 0}
               title="Undo"
@@ -566,28 +566,28 @@ export default function MindMapPage() {
             </button>
             <button
               onClick={redo}
-              className="p-2 rounded-lg transition-colors hover:bg-white/10"
+              className="p-1.5 sm:p-2 rounded-lg transition-colors hover:bg-white/10"
               style={{ color: historyIndex < history.length - 1 ? colors.text : colors.textMuted }}
               disabled={historyIndex >= history.length - 1}
               title="Redo"
             >
               <Redo className="w-4 h-4" />
             </button>
-            <div className="w-px h-6 mx-2" style={{ background: colors.border }} />
+            <div className="w-px h-5 sm:h-6 mx-1 sm:mx-2 hidden sm:block" style={{ background: colors.border }} />
             <button
               onClick={() => setZoom(z => Math.min(z + 0.1, 2))}
-              className="p-2 rounded-lg transition-colors hover:bg-white/10"
+              className="p-1.5 sm:p-2 rounded-lg transition-colors hover:bg-white/10 hidden sm:block"
               style={{ color: colors.textMuted }}
               title="Zoom In"
             >
               <ZoomIn className="w-4 h-4" />
             </button>
-            <span className="text-sm min-w-[50px] text-center" style={{ color: colors.textMuted }}>
+            <span className="text-xs sm:text-sm min-w-[40px] sm:min-w-[50px] text-center hidden sm:block" style={{ color: colors.textMuted }}>
               {Math.round(zoom * 100)}%
             </span>
             <button
               onClick={() => setZoom(z => Math.max(z - 0.1, 0.5))}
-              className="p-2 rounded-lg transition-colors hover:bg-white/10"
+              className="p-1.5 sm:p-2 rounded-lg transition-colors hover:bg-white/10 hidden sm:block"
               style={{ color: colors.textMuted }}
               title="Zoom Out"
             >
@@ -595,21 +595,22 @@ export default function MindMapPage() {
             </button>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             {connectingFrom && (
               <button
                 onClick={() => setConnectingFrom(null)}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm"
+                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm"
                 style={{ background: '#ef444420', color: '#ef4444' }}
               >
-                <Unlink className="w-4 h-4" />
-                Cancel Connection
+                <Unlink className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Cancel Connection</span>
+                <span className="sm:hidden">Cancel</span>
               </button>
             )}
-            <div className="w-px h-6 mx-2" style={{ background: colors.border }} />
+            <div className="w-px h-5 sm:h-6 mx-1 sm:mx-2" style={{ background: colors.border }} />
             <button
               onClick={exportMap}
-              className="p-2 rounded-lg transition-colors hover:bg-white/10"
+              className="p-1.5 sm:p-2 rounded-lg transition-colors hover:bg-white/10"
               style={{ color: colors.textMuted }}
               title="Export"
             >
@@ -617,7 +618,7 @@ export default function MindMapPage() {
             </button>
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="p-2 rounded-lg transition-colors hover:bg-white/10"
+              className="p-1.5 sm:p-2 rounded-lg transition-colors hover:bg-white/10"
               style={{ color: colors.textMuted }}
               title="Import"
             >
@@ -636,11 +637,13 @@ export default function MindMapPage() {
         {/* Canvas */}
         <div 
           ref={canvasRef}
-          className="relative rounded-2xl overflow-hidden"
+          className="relative rounded-xl sm:rounded-2xl overflow-hidden touch-pan-x touch-pan-y"
           style={{ 
             background: `radial-gradient(circle at center, ${colors.surface}, ${colors.background})`,
             border: `1px solid ${colors.border}`,
-            height: '600px',
+            height: 'calc(100vh - 320px)',
+            minHeight: '400px',
+            maxHeight: '600px',
             cursor: connectingFrom ? 'crosshair' : 'default'
           }}
           onClick={() => {
@@ -728,22 +731,22 @@ export default function MindMapPage() {
 
           {/* Empty state */}
           {nodes.length === 0 && (
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center px-4">
               <div className="text-center">
-                <Link2 className="w-12 h-12 mx-auto mb-4" style={{ color: colors.textMuted, opacity: 0.5 }} />
-                <p className="text-lg font-medium mb-2" style={{ color: colors.textMuted }}>
+                <Link2 className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4" style={{ color: colors.textMuted, opacity: 0.5 }} />
+                <p className="text-base sm:text-lg font-medium mb-2" style={{ color: colors.textMuted }}>
                   Start Building Your Tech Stack
                 </p>
-                <p className="text-sm" style={{ color: colors.textMuted, opacity: 0.7 }}>
+                <p className="text-xs sm:text-sm" style={{ color: colors.textMuted, opacity: 0.7 }}>
                   Click on tech components above to add them, then connect inputs and outputs
                 </p>
               </div>
             </div>
           )}
 
-          {/* Instructions */}
+          {/* Instructions - hidden on mobile */}
           <div 
-            className="absolute bottom-4 left-4 p-3 rounded-xl text-xs"
+            className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 p-2 sm:p-3 rounded-lg sm:rounded-xl text-xs hidden sm:block"
             style={{ 
               background: `${colors.surface}95`,
               backdropFilter: 'blur(10px)',
@@ -756,24 +759,24 @@ export default function MindMapPage() {
           </div>
         </div>
 
-        {/* Legend */}
+        {/* Legend - simplified on mobile */}
         <div 
-          className="mt-4 p-4 rounded-xl"
+          className="mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg sm:rounded-xl"
           style={{ background: colors.surface, border: `1px solid ${colors.border}` }}
         >
-          <p className="text-sm font-medium mb-3" style={{ color: colors.text }}>Connection Guide:</p>
-          <div className="flex flex-wrap gap-6">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full border-2" style={{ borderColor: '#7dd3a8' }} />
-              <span className="text-sm" style={{ color: colors.textMuted }}>Input Port (receives data)</span>
+          <p className="text-xs sm:text-sm font-medium mb-2 sm:mb-3" style={{ color: colors.text }}>Connection Guide:</p>
+          <div className="flex flex-wrap gap-3 sm:gap-6">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full border-2" style={{ borderColor: '#7dd3a8' }} />
+              <span className="text-xs sm:text-sm" style={{ color: colors.textMuted }}>Input</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full border-2" style={{ borderColor: '#e879a9' }} />
-              <span className="text-sm" style={{ color: colors.textMuted }}>Output Port (sends data)</span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full border-2" style={{ borderColor: '#e879a9' }} />
+              <span className="text-xs sm:text-sm" style={{ color: colors.textMuted }}>Output</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-0.5" style={{ background: colors.primary }} />
-              <span className="text-sm" style={{ color: colors.textMuted }}>Connection (click to delete)</span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="w-6 sm:w-8 h-0.5" style={{ background: colors.primary }} />
+              <span className="text-xs sm:text-sm" style={{ color: colors.textMuted }}>Connection</span>
             </div>
           </div>
         </div>

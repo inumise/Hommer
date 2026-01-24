@@ -96,19 +96,19 @@ export default function EnterprisePage() {
   }
 
   return (
-    <div className="min-h-screen pt-28 pb-8 px-4">
+    <div className="min-h-screen pt-24 sm:pt-28 pb-6 sm:pb-8 px-3 sm:px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8 sm:mb-12">
           <p 
-            className="text-sm tracking-[0.3em] uppercase mb-4"
+            className="text-xs sm:text-sm tracking-[0.2em] sm:tracking-[0.3em] uppercase mb-3 sm:mb-4"
             style={{ color: colors.textMuted }}
           >
             Enterprise Solutions
           </p>
           <h1 
             ref={titleRef}
-            className="text-3xl md:text-4xl lg:text-5xl font-light mb-4"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light mb-3 sm:mb-4"
             style={{ color: colors.text }}
           >
             <span 
@@ -124,7 +124,7 @@ export default function EnterprisePage() {
             </span>
           </h1>
           <p 
-            className="text-lg max-w-2xl mx-auto"
+            className="text-sm sm:text-lg max-w-2xl mx-auto px-2"
             style={{ color: colors.textMuted }}
           >
             Transform your business with our enterprise-grade solutions. 
@@ -132,21 +132,21 @@ export default function EnterprisePage() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-4 sm:gap-8">
           {/* Contact Form */}
           <div 
-            className="rounded-2xl p-6 md:p-8"
+            className="rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8"
             style={{ background: colors.surface, border: `1px solid ${colors.border}` }}
           >
-            <h2 className="text-xl font-semibold mb-6" style={{ color: colors.text }}>
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6" style={{ color: colors.text }}>
               Enterprise Inquiry
             </h2>
 
-            <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
               {/* Name & Company */}
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-sm mb-2" style={{ color: colors.textMuted }}>
+                  <label className="block text-xs sm:text-sm mb-1.5 sm:mb-2" style={{ color: colors.textMuted }}>
                     Full Name *
                   </label>
                   <input
@@ -155,7 +155,7 @@ export default function EnterprisePage() {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full p-3 rounded-xl outline-none transition-all focus:ring-2"
+                    className="w-full p-2.5 sm:p-3 rounded-lg sm:rounded-xl outline-none transition-all focus:ring-2 text-sm sm:text-base"
                     style={{ 
                       background: colors.background, 
                       color: colors.text, 
@@ -165,7 +165,7 @@ export default function EnterprisePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm mb-2" style={{ color: colors.textMuted }}>
+                  <label className="block text-xs sm:text-sm mb-1.5 sm:mb-2" style={{ color: colors.textMuted }}>
                     Company *
                   </label>
                   <input
@@ -174,16 +174,16 @@ export default function EnterprisePage() {
                     value={formData.company}
                     onChange={handleChange}
                     required
-                    className="w-full p-3 rounded-xl outline-none"
+                    className="w-full p-2.5 sm:p-3 rounded-lg sm:rounded-xl outline-none text-sm sm:text-base"
                     style={{ background: colors.background, color: colors.text, border: `1px solid ${colors.border}` }}
                   />
                 </div>
               </div>
 
               {/* Email & Phone */}
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-sm mb-2" style={{ color: colors.textMuted }}>
+                  <label className="block text-xs sm:text-sm mb-1.5 sm:mb-2" style={{ color: colors.textMuted }}>
                     Email *
                   </label>
                   <input
@@ -192,12 +192,12 @@ export default function EnterprisePage() {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full p-3 rounded-xl outline-none"
+                    className="w-full p-2.5 sm:p-3 rounded-lg sm:rounded-xl outline-none text-sm sm:text-base"
                     style={{ background: colors.background, color: colors.text, border: `1px solid ${colors.border}` }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm mb-2" style={{ color: colors.textMuted }}>
+                  <label className="block text-xs sm:text-sm mb-1.5 sm:mb-2" style={{ color: colors.textMuted }}>
                     Phone
                   </label>
                   <input
@@ -205,7 +205,7 @@ export default function EnterprisePage() {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full p-3 rounded-xl outline-none"
+                    className="w-full p-2.5 sm:p-3 rounded-lg sm:rounded-xl outline-none text-sm sm:text-base"
                     style={{ background: colors.background, color: colors.text, border: `1px solid ${colors.border}` }}
                   />
                 </div>
@@ -213,8 +213,8 @@ export default function EnterprisePage() {
 
               {/* Price Range - REQUIRED */}
               <div>
-                <label className="block text-sm mb-2" style={{ color: colors.textMuted }}>
-                  <DollarSign className="w-4 h-4 inline mr-1" />
+                <label className="block text-xs sm:text-sm mb-1.5 sm:mb-2" style={{ color: colors.textMuted }}>
+                  <DollarSign className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
                   Budget Range * <span className="text-xs">(Required)</span>
                 </label>
                 <select
@@ -222,7 +222,7 @@ export default function EnterprisePage() {
                   value={formData.priceRange}
                   onChange={handleChange}
                   required
-                  className="w-full p-3 rounded-xl outline-none appearance-none cursor-pointer"
+                  className="w-full p-2.5 sm:p-3 rounded-lg sm:rounded-xl outline-none appearance-none cursor-pointer text-sm sm:text-base"
                   style={{ background: colors.background, color: colors.text, border: `1px solid ${colors.border}` }}
                 >
                   <option value="">Select your budget range</option>
@@ -234,8 +234,8 @@ export default function EnterprisePage() {
 
               {/* Deadline - REQUIRED */}
               <div>
-                <label className="block text-sm mb-2" style={{ color: colors.textMuted }}>
-                  <Calendar className="w-4 h-4 inline mr-1" />
+                <label className="block text-xs sm:text-sm mb-1.5 sm:mb-2" style={{ color: colors.textMuted }}>
+                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
                   Target Completion Date * <span className="text-xs">(Required)</span>
                 </label>
                 <input
@@ -245,21 +245,21 @@ export default function EnterprisePage() {
                   onChange={handleChange}
                   required
                   min={new Date().toISOString().split('T')[0]}
-                  className="w-full p-3 rounded-xl outline-none"
+                  className="w-full p-2.5 sm:p-3 rounded-lg sm:rounded-xl outline-none text-sm sm:text-base"
                   style={{ background: colors.background, color: colors.text, border: `1px solid ${colors.border}` }}
                 />
               </div>
 
               {/* Project Type */}
               <div>
-                <label className="block text-sm mb-2" style={{ color: colors.textMuted }}>
+                <label className="block text-xs sm:text-sm mb-1.5 sm:mb-2" style={{ color: colors.textMuted }}>
                   Project Type
                 </label>
                 <select
                   name="projectType"
                   value={formData.projectType}
                   onChange={handleChange}
-                  className="w-full p-3 rounded-xl outline-none appearance-none cursor-pointer"
+                  className="w-full p-2.5 sm:p-3 rounded-lg sm:rounded-xl outline-none appearance-none cursor-pointer text-sm sm:text-base"
                   style={{ background: colors.background, color: colors.text, border: `1px solid ${colors.border}` }}
                 >
                   <option value="">Select project type</option>
@@ -274,7 +274,7 @@ export default function EnterprisePage() {
 
               {/* Description */}
               <div>
-                <label className="block text-sm mb-2" style={{ color: colors.textMuted }}>
+                <label className="block text-xs sm:text-sm mb-1.5 sm:mb-2" style={{ color: colors.textMuted }}>
                   Project Description *
                 </label>
                 <textarea
@@ -282,9 +282,9 @@ export default function EnterprisePage() {
                   value={formData.description}
                   onChange={handleChange}
                   required
-                  rows={5}
+                  rows={4}
                   placeholder="Tell us about your project requirements, goals, and any specific features you need..."
-                  className="w-full p-3 rounded-xl outline-none resize-none"
+                  className="w-full p-2.5 sm:p-3 rounded-lg sm:rounded-xl outline-none resize-none text-sm sm:text-base"
                   style={{ background: colors.background, color: colors.text, border: `1px solid ${colors.border}` }}
                 />
               </div>
@@ -293,7 +293,7 @@ export default function EnterprisePage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all hover:scale-[1.02] disabled:opacity-70"
+                className="w-full py-3 sm:py-4 rounded-lg sm:rounded-xl font-medium flex items-center justify-center gap-2 transition-all hover:scale-[1.02] disabled:opacity-70 text-sm sm:text-base"
                 style={{ background: colors.gradient, color: colors.background }}
               >
                 {isSubmitting ? (

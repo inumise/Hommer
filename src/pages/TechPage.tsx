@@ -95,7 +95,7 @@ function TechCard({ item, index }: { item: typeof technologies[0]['items'][0]; i
   return (
     <div
       ref={cardRef}
-      className="relative rounded-xl p-5 transition-all duration-300 cursor-pointer group"
+      className="relative rounded-lg sm:rounded-xl p-3 sm:p-5 transition-all duration-300 cursor-pointer group"
       style={{
         background: isHovered ? `${colors.primary}15` : colors.surface,
         border: `1px solid ${isHovered ? colors.primary + '40' : colors.border}`,
@@ -106,16 +106,16 @@ function TechCard({ item, index }: { item: typeof technologies[0]['items'][0]; i
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Icon with preview animation */}
-      <div className="relative mb-4">
+      <div className="relative mb-2 sm:mb-4">
         <div 
-          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300"
+          className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center transition-all duration-300"
           style={{ 
             background: `${colors.primary}20`,
             transform: isHovered ? 'scale(1.1)' : 'scale(1)'
           }}
         >
           <Icon 
-            className="w-6 h-6 transition-all duration-300" 
+            className="w-5 h-5 sm:w-6 sm:h-6 transition-all duration-300" 
             style={{ 
               color: colors.primary,
               filter: isHovered ? `drop-shadow(0 0 8px ${colors.primary})` : 'none'
@@ -123,9 +123,9 @@ function TechCard({ item, index }: { item: typeof technologies[0]['items'][0]; i
           />
         </div>
         
-        {/* Preview badge on hover */}
+        {/* Preview badge on hover - hidden on mobile */}
         <div 
-          className="absolute -top-2 -right-2 px-2 py-1 rounded-full text-xs font-medium transition-all duration-300"
+          className="absolute -top-2 -right-2 px-2 py-1 rounded-full text-xs font-medium transition-all duration-300 hidden sm:block"
           style={{
             background: colors.gradient,
             color: colors.background,
@@ -139,13 +139,13 @@ function TechCard({ item, index }: { item: typeof technologies[0]['items'][0]; i
 
       {/* Content */}
       <h3 
-        className="font-semibold mb-1 transition-colors duration-300"
+        className="font-semibold mb-1 transition-colors duration-300 text-sm sm:text-base"
         style={{ color: isHovered ? colors.primary : colors.text }}
       >
         {item.name}
       </h3>
       <p 
-        className="text-sm"
+        className="text-xs sm:text-sm line-clamp-2"
         style={{ color: colors.textMuted }}
       >
         {item.description}
@@ -184,19 +184,19 @@ export default function TechPage() {
   }, [])
 
   return (
-    <div className="min-h-screen pt-32 pb-20 px-4">
+    <div className="min-h-screen pt-24 sm:pt-32 pb-12 sm:pb-20 px-3 sm:px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-8 sm:mb-16">
           <p 
-            className="text-sm tracking-[0.3em] uppercase mb-4"
+            className="text-xs sm:text-sm tracking-[0.2em] sm:tracking-[0.3em] uppercase mb-3 sm:mb-4"
             style={{ color: colors.textMuted }}
           >
             Technology Stack
           </p>
           <h1 
             ref={titleRef}
-            className="text-4xl md:text-5xl lg:text-6xl font-light mb-6"
+            className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-light mb-4 sm:mb-6"
             style={{ color: colors.text }}
           >
             <span 
@@ -212,7 +212,7 @@ export default function TechPage() {
             </span>
           </h1>
           <p 
-            className="text-lg max-w-2xl mx-auto"
+            className="text-sm sm:text-lg max-w-2xl mx-auto px-2"
             style={{ color: colors.textMuted }}
           >
             Cutting-edge tools and frameworks powering next-generation digital experiences
@@ -221,19 +221,19 @@ export default function TechPage() {
 
         {/* Technology Categories */}
         {technologies.map((category, catIndex) => (
-          <div key={category.category} className="mb-16">
+          <div key={category.category} className="mb-8 sm:mb-16">
             <h2 
-              className="text-xl font-semibold mb-6 flex items-center gap-3"
+              className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3"
               style={{ color: colors.text }}
             >
               <div 
-                className="w-1 h-6 rounded-full"
+                className="w-1 h-5 sm:h-6 rounded-full"
                 style={{ background: colors.gradient }}
               />
               {category.category}
             </h2>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
               {category.items.map((item, itemIndex) => (
                 <TechCard 
                   key={item.name} 

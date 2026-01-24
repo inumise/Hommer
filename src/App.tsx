@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, lazy, Suspense } from 'react'
+import { useEffect, useRef, useState, lazy, Suspense, useCallback } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ThemeProvider, useTheme } from './contexts/ThemeContext'
@@ -14,6 +14,9 @@ import Footer from './components/Footer'
 import AccessibilityMenu from './components/AccessibilityMenu'
 import LeftSideMenu from './components/LeftSideMenu'
 import Navigation, { PageType } from './components/Navigation'
+import LoadingScreen from './components/LoadingScreen'
+import { preloadFonts } from './utils/assetPreloader'
+import { getDeviceCapabilities } from './utils/performanceOptimizer'
 
 // Lazy load pages for better performance - only loads when navigated to
 const TechPage = lazy(() => import('./pages/TechPage'))
@@ -89,6 +92,28 @@ function MainPage() {
 function App() {
   const mainRef = useRef<HTMLDivElement>(null)
   const [currentPage, setCurrentPage] = useState<PageType>('main')
+  const [isLoading, setIsLoading] = useState(true)
+  const [showContent, setShowContent] = useState(false)
+
+  // Handle loading complete
+  const handleLoadComplete = useCallback(() => {
+    setIsLoading(false)
+    // Slight delay before showing content for smooth transition
+    setTimeout(() => setShowContent(true), 100)
+  }, [])
+
+  // Preload fonts and detect device capabilities on mount
+  useEffect(() => {
+    const init = async () => {
+      // Log device capabilities for debugging
+      const caps = getDeviceCapabilities()
+      console.log('[Performance] Device capabilities:', caps)
+      
+      // Preload critical fonts
+      await preloadFonts(['Space Grotesk', 'Orbitron'])
+    }
+    init()
+  }, [])
 
   useEffect(() => {
     const updateScrollProgress = () => {
@@ -137,7 +162,17 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div ref={mainRef} className="relative min-h-screen bg-black text-white overflow-x-hidden">
+      {/* Sacred Loading Screen */}
+      {isLoading && (
+        <LoadingScreen onLoadComplete={handleLoadComplete} />
+      )}
+      
+      {/* Main Content - with fade-in transition */}
+      <div 
+        ref={mainRef} 
+        className="relative min-h-screen bg-black text-white overflow-x-hidden transition-opacity duration-500"
+        style={{ opacity: showContent ? 1 : 0 }}
+      >
         <Scene3D />
         <AccessibilityMenu />
         <Navigation currentPage={currentPage} onPageChange={setCurrentPage} />

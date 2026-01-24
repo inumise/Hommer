@@ -482,18 +482,18 @@ export default function SensePage() {
   const selectedPathData = lifePaths.find(p => p.name === selectedPath)
 
   return (
-    <div className="min-h-screen pt-28 pb-8 px-4">
+    <div className="min-h-screen pt-24 sm:pt-28 pb-6 sm:pb-8 px-3 sm:px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header - Cryptic and Mystical */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           <p 
-            className="text-xs tracking-[0.8em] uppercase mb-3 font-mono animate-pulse"
+            className="text-[10px] sm:text-xs tracking-[0.4em] sm:tracking-[0.8em] uppercase mb-2 sm:mb-3 font-mono animate-pulse"
             style={{ color: colors.textMuted }}
           >
             ॐ The Hidden Network ॐ
           </p>
           <h1 
-            className="text-4xl md:text-5xl lg:text-6xl font-light mb-4"
+            className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-light mb-3 sm:mb-4"
             style={{ color: colors.text }}
           >
             <span 
@@ -511,7 +511,7 @@ export default function SensePage() {
             </span>
           </h1>
           <p 
-            className="text-sm max-w-2xl mx-auto font-mono opacity-80 leading-relaxed"
+            className="text-xs sm:text-sm max-w-2xl mx-auto font-mono opacity-80 leading-relaxed px-2"
             style={{ color: colors.textMuted }}
           >
             Where Ayurveda meets the mycelium network, where sacred fruits hold universal truths,
@@ -519,7 +519,7 @@ export default function SensePage() {
             in ways that can only be felt, never fully understood.
           </p>
           <p 
-            className="text-xs mt-3 font-mono tracking-widest"
+            className="text-[10px] sm:text-xs mt-2 sm:mt-3 font-mono tracking-widest"
             style={{ color: colors.primary, opacity: 0.6 }}
           >
             [ This knowledge is prohibited to those who seek without reverence ]
@@ -529,11 +529,13 @@ export default function SensePage() {
         {/* Sacred Network Visualization - 3D Perspective */}
         <div 
           ref={containerRef}
-          className="relative rounded-3xl overflow-hidden mb-8"
+          className="relative rounded-2xl sm:rounded-3xl overflow-hidden mb-6 sm:mb-8 touch-pan-x touch-pan-y"
           style={{ 
             background: `radial-gradient(ellipse at center, ${colors.surface}90, ${colors.background})`,
             border: `1px solid ${colors.border}`,
-            height: '600px',
+            height: 'calc(100vh - 280px)',
+            minHeight: '350px',
+            maxHeight: '600px',
             perspective: '1000px',
             perspectiveOrigin: '50% 50%'
           }}
@@ -559,7 +561,7 @@ export default function SensePage() {
 
           {/* Center eye - the observer */}
           <div 
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 rounded-full flex items-center justify-center"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 sm:w-28 sm:h-28 rounded-full flex items-center justify-center"
             style={{
               background: `radial-gradient(circle, ${colors.primary}30, transparent)`,
               border: `1px solid ${colors.primary}50`,
@@ -567,7 +569,7 @@ export default function SensePage() {
             }}
           >
             <Eye 
-              className="w-10 h-10 animate-pulse" 
+              className="w-7 h-7 sm:w-10 sm:h-10 animate-pulse" 
               style={{ 
                 color: colors.primary, 
                 opacity: 0.8,
@@ -593,7 +595,7 @@ export default function SensePage() {
           {/* Revealed phrase */}
           {revealedPhrase && (
             <div 
-              className="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full text-sm font-mono"
+              className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 px-4 sm:px-6 py-2 sm:py-3 rounded-full text-xs sm:text-sm font-mono max-w-[90%] text-center"
               style={{ 
                 background: `${colors.surface}e0`,
                 backdropFilter: 'blur(10px)',
@@ -606,9 +608,9 @@ export default function SensePage() {
             </div>
           )}
 
-          {/* Layer legend */}
+          {/* Layer legend - hidden on mobile */}
           <div 
-            className="absolute top-4 right-4 p-3 rounded-xl text-xs font-mono"
+            className="absolute top-3 sm:top-4 right-3 sm:right-4 p-2 sm:p-3 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-mono hidden sm:block"
             style={{ 
               background: `${colors.surface}95`,
               backdropFilter: 'blur(10px)',
@@ -636,48 +638,48 @@ export default function SensePage() {
         {/* Active Element Details */}
         {activeElementData && (
           <div 
-            className="rounded-3xl p-8 mb-8 transition-all duration-500"
+            className="rounded-2xl sm:rounded-3xl p-4 sm:p-8 mb-6 sm:mb-8 transition-all duration-500"
             style={{ 
               background: `linear-gradient(135deg, ${activeElementData.color}18, ${colors.surface})`,
               border: `1px solid ${activeElementData.color}60`,
               boxShadow: `0 20px 60px ${activeElementData.color}20`
             }}
           >
-            <div className="flex items-start gap-6">
+            <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
               <div 
-                className="w-20 h-20 rounded-2xl flex items-center justify-center flex-shrink-0"
+                className="w-14 h-14 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0"
                 style={{ 
                   background: `radial-gradient(circle, ${activeElementData.color}40, ${activeElementData.color}15)`,
                   border: `2px solid ${activeElementData.color}60`
                 }}
               >
-                <span className="text-3xl">{activeElementData.symbol}</span>
+                <span className="text-2xl sm:text-3xl">{activeElementData.symbol}</span>
               </div>
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h3 className="text-2xl font-bold" style={{ color: colors.text }}>
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                  <h3 className="text-xl sm:text-2xl font-bold" style={{ color: colors.text }}>
                     {activeElementData.name}
                   </h3>
                   <span 
-                    className="text-xs px-3 py-1 rounded-full font-mono"
+                    className="text-[10px] sm:text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded-full font-mono"
                     style={{ background: `${activeElementData.color}25`, color: activeElementData.color }}
                   >
                     {activeElementData.layer}
                   </span>
                 </div>
-                <p className="text-sm mb-3" style={{ color: activeElementData.color }}>
+                <p className="text-xs sm:text-sm mb-2 sm:mb-3" style={{ color: activeElementData.color }}>
                   {activeElementData.element}
                 </p>
-                <p className="leading-relaxed mb-4" style={{ color: colors.textMuted }}>
+                <p className="text-sm sm:text-base leading-relaxed mb-3 sm:mb-4" style={{ color: colors.textMuted }}>
                   {activeElementData.description}
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
                   {activeElementData.connections.map(connId => {
                     const conn = sacredElements.find(e => e.id === connId)
                     return conn ? (
                       <button 
                         key={connId}
-                        className="text-sm px-4 py-2 rounded-xl cursor-pointer transition-all hover:scale-105"
+                        className="text-xs sm:text-sm px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl cursor-pointer transition-all hover:scale-105"
                         style={{ 
                           background: `${conn.color}18`, 
                           color: conn.color,
@@ -696,21 +698,21 @@ export default function SensePage() {
         )}
 
         {/* Life Paths */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <h2 
-            className="text-2xl font-bold mb-6 text-center flex items-center justify-center gap-3"
+            className="text-lg sm:text-2xl font-bold mb-4 sm:mb-6 text-center flex items-center justify-center gap-2 sm:gap-3"
             style={{ color: colors.text }}
           >
-            <Compass className="w-6 h-6" style={{ color: colors.primary }} />
+            <Compass className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: colors.primary }} />
             The Six Paths of Life
-            <Compass className="w-6 h-6" style={{ color: colors.primary, transform: 'scaleX(-1)' }} />
+            <Compass className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: colors.primary, transform: 'scaleX(-1)' }} />
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4">
             {lifePaths.map((path) => (
               <button
                 key={path.name}
                 onClick={() => setSelectedPath(selectedPath === path.name ? null : path.name)}
-                className="p-5 rounded-2xl text-center transition-all duration-300 hover:scale-105"
+                className="p-3 sm:p-5 rounded-xl sm:rounded-2xl text-center transition-all duration-300 hover:scale-105"
                 style={{
                   background: selectedPath === path.name 
                     ? `linear-gradient(135deg, ${colors.primary}30, ${colors.secondary}20)` 
@@ -719,10 +721,10 @@ export default function SensePage() {
                   boxShadow: selectedPath === path.name ? `0 10px 40px ${colors.primary}25` : 'none'
                 }}
               >
-                <p className="text-xl font-mono mb-2" style={{ color: colors.primary }}>
+                <p className="text-base sm:text-xl font-mono mb-1 sm:mb-2" style={{ color: colors.primary }}>
                   {path.cipher}
                 </p>
-                <p className="text-sm font-semibold" style={{ color: colors.text }}>
+                <p className="text-xs sm:text-sm font-semibold" style={{ color: colors.text }}>
                   {path.name}
                 </p>
               </button>
@@ -732,22 +734,22 @@ export default function SensePage() {
           {/* Selected path details */}
           {selectedPathData && (
             <div 
-              className="mt-6 p-6 rounded-2xl text-center"
+              className="mt-4 sm:mt-6 p-4 sm:p-6 rounded-xl sm:rounded-2xl text-center"
               style={{ 
                 background: `${colors.surface}90`,
                 border: `1px solid ${colors.border}`
               }}
             >
-              <p className="mb-4" style={{ color: colors.textMuted }}>
+              <p className="text-sm sm:text-base mb-3 sm:mb-4" style={{ color: colors.textMuted }}>
                 {selectedPathData.description}
               </p>
-              <div className="flex justify-center gap-3 flex-wrap">
+              <div className="flex justify-center gap-2 sm:gap-3 flex-wrap">
                 {selectedPathData.elements.map(elemId => {
                   const elem = sacredElements.find(e => e.id === elemId)
                   return elem ? (
                     <button
                       key={elemId}
-                      className="px-4 py-2 rounded-xl text-sm transition-all hover:scale-105"
+                      className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm transition-all hover:scale-105"
                       style={{ 
                         background: `${elem.color}20`, 
                         color: elem.color,
@@ -766,26 +768,26 @@ export default function SensePage() {
 
         {/* Cryptic Footer */}
         <div 
-          className="text-center p-8 rounded-3xl"
+          className="text-center p-4 sm:p-8 rounded-2xl sm:rounded-3xl"
           style={{ 
             background: `linear-gradient(180deg, ${colors.surface}, ${colors.background})`,
             border: `1px solid ${colors.border}`
           }}
         >
           <p 
-            className="text-xs font-mono tracking-[0.5em] mb-4"
+            className="text-[10px] sm:text-xs font-mono tracking-[0.3em] sm:tracking-[0.5em] mb-3 sm:mb-4"
             style={{ color: colors.textMuted }}
           >
             THE NETWORK CONNECTS ALL WHO SEEK
           </p>
           <p 
-            className="text-lg font-mono mb-4"
+            className="text-base sm:text-lg font-mono mb-3 sm:mb-4"
             style={{ color: colors.primary }}
           >
             ॐ ☉ ☽ ⊕ ✧ ∞ ❦ 🍄 🍎 🌿 💧 🔮 ॐ
           </p>
           <p 
-            className="text-xs font-mono opacity-50"
+            className="text-[10px] sm:text-xs font-mono opacity-50 px-2"
             style={{ color: colors.textMuted }}
           >
             "The fruit contains the seed, the seed contains the tree,
