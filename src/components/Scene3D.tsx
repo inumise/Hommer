@@ -1,5 +1,24 @@
 import { useEffect, useRef, useState } from 'react'
 
+// FPS Monitor for adaptive quality
+class FPSMonitor {
+  private frames: number[] = []
+  private lastTime = performance.now()
+  private currentFPS = 60
+  
+  update(): number {
+    const now = performance.now()
+    const delta = now - this.lastTime
+    this.lastTime = now
+    if (delta > 0) {
+      this.frames.push(1000 / delta)
+      if (this.frames.length > 20) this.frames.shift()
+      this.currentFPS = this.frames.reduce((a, b) => a + b, 0) / this.frames.length
+    }
+    return this.currentFPS
+  }
+}
+
 const pastelColors = [
   '#e879a9', '#f4a574', '#f0d878', '#7dd3a8', 
   '#7ec8d8', '#7ba3d8', '#a78bcc', '#c9a0c9'
@@ -84,25 +103,56 @@ function CrystallineBackground() {
   const laserBeamsRef = useRef<LaserBeam[]>([])
   const metallicParticlesRef = useRef<MetallicParticle[]>([])
   const timeRef = useRef(0)
+  
+  // Performance optimization refs
+  const fpsMonitorRef = useRef(new FPSMonitor())
+  const lastFrameTimeRef = useRef(0)
+  const isVisibleRef = useRef(true)
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true })
     if (!ctx) return
+    
+    // Get performance config based on device
+    const isMobile = isMobileDevice()
+    const maxFPS = isMobile ? 30 : 60
+    const frameInterval = 1000 / maxFPS
+    
+    // Visibility API - pause when tab hidden
+    const handleVisibilityChange = () => {
+      isVisibleRef.current = !document.hidden
+      if (isVisibleRef.current) {
+        lastFrameTimeRef.current = performance.now()
+        animationRef.current = requestAnimationFrame(animate)
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
 
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      // Scale canvas for performance - cap devicePixelRatio
+      const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1 : 1.5)
+      canvas.width = window.innerWidth * dpr
+      canvas.height = window.innerHeight * dpr
+      canvas.style.width = window.innerWidth + 'px'
+      canvas.style.height = window.innerHeight + 'px'
+      ctx.scale(dpr, dpr)
       initElements()
+    }
+    
+    // Debounced resize handler
+    let resizeTimeout: ReturnType<typeof setTimeout>
+    const handleResize = () => {
+      clearTimeout(resizeTimeout)
+      resizeTimeout = setTimeout(resizeCanvas, 200)
     }
 
     const initElements = () => {
-      // Reduce particle counts on mobile for smooth performance
-      const isMobile = isMobileDevice()
-      const microCount = isMobile ? 8 : 20
-      const woodCount = isMobile ? 25 : 60
-      const laserCount = isMobile ? 3 : 6
+      // OPTIMIZED: Further reduced particle counts for smooth performance
+      const microCount = isMobile ? 6 : 12
+      const woodCount = isMobile ? 15 : 35
+      const laserCount = isMobile ? 2 : 4
 
       microorganismsRef.current = Array.from({ length: microCount }, () => ({
         x: Math.random() * canvas.width,
@@ -154,7 +204,7 @@ function CrystallineBackground() {
     }
 
     resizeCanvas()
-    window.addEventListener('resize', resizeCanvas)
+    window.addEventListener('resize', handleResize)
 
     const createLightning = () => {
       if (lightningsRef.current.length < 2 && Math.random() < 0.006) {
@@ -185,90 +235,83 @@ function CrystallineBackground() {
       }
     }
 
+    // OPTIMIZED: Removed blur filter (major performance killer), simplified tentacle drawing
     const drawMicroorganism = (org: Microorganism, time: number) => {
-      const pulse = Math.sin(time * 0.4 + org.pulsePhase) * 0.2 + 0.85
+      const pulse = Math.sin(time * 0.3 + org.pulsePhase) * 0.15 + 0.9
       const size = org.size * pulse
       ctx.save()
       ctx.translate(org.x, org.y)
       ctx.rotate(org.rotation)
-      ctx.filter = 'blur(3px)'
       
+      // Simplified tentacles - lines instead of bezier curves
+      ctx.strokeStyle = org.color + '18'
+      ctx.lineWidth = 3
+      ctx.beginPath()
       for (let i = 0; i < org.tentacles; i++) {
         const tAngle = (i / org.tentacles) * Math.PI * 2
-        const wave = Math.sin(time * 0.25 + i + org.pulsePhase) * 12
-        ctx.beginPath()
+        const wave = Math.sin(time * 0.2 + i + org.pulsePhase) * 6
         ctx.moveTo(0, 0)
-        ctx.bezierCurveTo(
-          Math.cos(tAngle) * size * 0.5 + wave, Math.sin(tAngle) * size * 0.5,
-          Math.cos(tAngle) * size * 0.8 - wave * 0.5, Math.sin(tAngle) * size * 0.8 + wave * 0.3,
-          Math.cos(tAngle) * size * 1.3 + wave * 0.3, Math.sin(tAngle) * size * 1.3
+        ctx.lineTo(
+          Math.cos(tAngle) * size + wave * 0.3,
+          Math.sin(tAngle) * size
         )
-        ctx.strokeStyle = org.color + '25'
-        ctx.lineWidth = 4
-        ctx.stroke()
       }
+      ctx.stroke()
       
+      // Simplified body - single circle with opacity
       ctx.beginPath()
-      for (let i = 0; i <= 36; i++) {
-        const angle = (i / 36) * Math.PI * 2
-        const wobble = Math.sin(angle * 3 + time * 0.35 + org.pulsePhase) * size * 0.12
-        const r = size * 0.4 + wobble
-        if (i === 0) ctx.moveTo(Math.cos(angle) * r, Math.sin(angle) * r)
-        else ctx.lineTo(Math.cos(angle) * r, Math.sin(angle) * r)
-      }
-      ctx.closePath()
-      const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 0.5)
-      grad.addColorStop(0, org.color + '20')
-      grad.addColorStop(0.6, org.color + '10')
-      grad.addColorStop(1, 'transparent')
-      ctx.fillStyle = grad
+      ctx.arc(0, 0, size * 0.35, 0, Math.PI * 2)
+      ctx.fillStyle = org.color + '12'
       ctx.fill()
       
+      // Core
       ctx.beginPath()
-      ctx.arc(0, 0, size * 0.12, 0, Math.PI * 2)
-      ctx.fillStyle = org.color + '35'
+      ctx.arc(0, 0, size * 0.1, 0, Math.PI * 2)
+      ctx.fillStyle = org.color + '30'
       ctx.fill()
-      ctx.filter = 'none'
+      
       ctx.restore()
     }
 
+    // OPTIMIZED: Removed blur filter
     const drawWoodParticle = (p: WoodParticle, time: number) => {
-      const drift = Math.sin(time * 0.08 + p.drift) * 6
+      const drift = Math.sin(time * 0.05 + p.drift) * 4
       ctx.save()
       ctx.translate(p.x + drift, p.y)
       ctx.rotate(p.angle)
-      ctx.filter = 'blur(1px)'
+      ctx.globalAlpha = p.opacity
+      ctx.strokeStyle = p.color
+      ctx.lineWidth = 1
       ctx.beginPath()
       ctx.moveTo(-p.length / 2, 0)
       ctx.lineTo(p.length / 2, 0)
-      ctx.strokeStyle = p.color
-      ctx.lineWidth = 1
-      ctx.globalAlpha = p.opacity
       ctx.stroke()
-      ctx.filter = 'none'
-      ctx.globalAlpha = 1
       ctx.restore()
     }
 
+    // OPTIMIZED: Removed shadowBlur (expensive), simplified drawing
     const drawLightning = (l: Lightning) => {
       const progress = l.life / l.maxLife
-      const opacity = Math.min(progress * 4, 1) * Math.max(0, 1 - (progress - 0.75) / 0.25) * 0.5
+      const opacity = Math.min(progress * 4, 1) * Math.max(0, 1 - (progress - 0.75) / 0.25) * 0.4
       ctx.save()
       ctx.globalAlpha = opacity
-      l.branches.forEach((b, i) => {
-        ctx.beginPath()
+      
+      // Draw all branches in a single path for better performance
+      ctx.beginPath()
+      l.branches.forEach((b) => {
         ctx.moveTo(b.x, b.y)
         ctx.lineTo(b.x + Math.cos(b.angle) * b.length, b.y + Math.sin(b.angle) * b.length)
-        ctx.shadowColor = l.color
-        ctx.shadowBlur = 12
-        ctx.strokeStyle = l.color
-        ctx.lineWidth = i < 10 ? 1.5 : 0.8
-        ctx.stroke()
-        ctx.shadowBlur = 0
-        ctx.strokeStyle = '#fff'
-        ctx.lineWidth = i < 10 ? 0.8 : 0.4
-        ctx.stroke()
       })
+      ctx.strokeStyle = l.color
+      ctx.lineWidth = 1.2
+      ctx.stroke()
+      
+      // Single white highlight pass
+      ctx.globalAlpha = opacity * 0.5
+      ctx.strokeStyle = '#fff'
+      ctx.lineWidth = 0.5
+      ctx.stroke()
+      
       ctx.restore()
     }
 
@@ -295,51 +338,33 @@ function CrystallineBackground() {
       ctx.restore()
     }
 
+    // OPTIMIZED: Simplified metallic particle - removed expensive gradients
     const drawMetallicParticle = (p: MetallicParticle, time: number) => {
-      const shimmer = Math.sin(time * 0.8 + p.shimmerPhase) * 0.3 + 0.7
-      const size = p.size * (0.9 + Math.sin(time * 0.3 + p.shimmerPhase) * 0.1)
+      const shimmer = Math.sin(time * 0.5 + p.shimmerPhase) * 0.2 + 0.6
+      const size = p.size
       
       ctx.save()
       ctx.translate(p.x, p.y)
       ctx.rotate(p.rotation)
+      ctx.globalAlpha = shimmer * p.glowIntensity
       
-      // Outer glow
-      const glowGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 1.5)
-      glowGrad.addColorStop(0, p.color + '40')
-      glowGrad.addColorStop(0.5, p.color + '15')
-      glowGrad.addColorStop(1, 'transparent')
-      ctx.fillStyle = glowGrad
-      ctx.globalAlpha = p.glowIntensity * shimmer
-      ctx.beginPath()
-      ctx.arc(0, 0, size * 1.5, 0, Math.PI * 2)
-      ctx.fill()
-      
-      // Main metallic body - diamond/crystal shape
-      ctx.globalAlpha = 0.6 * shimmer
+      // Diamond shape - single fill
       ctx.beginPath()
       ctx.moveTo(0, -size)
-      ctx.lineTo(size * 0.6, 0)
+      ctx.lineTo(size * 0.5, 0)
       ctx.lineTo(0, size)
-      ctx.lineTo(-size * 0.6, 0)
+      ctx.lineTo(-size * 0.5, 0)
       ctx.closePath()
-      
-      // Metallic gradient
-      const metalGrad = ctx.createLinearGradient(-size, -size, size, size)
-      metalGrad.addColorStop(0, p.color)
-      metalGrad.addColorStop(0.3, '#ffffff')
-      metalGrad.addColorStop(0.5, p.color)
-      metalGrad.addColorStop(0.7, '#ffffff')
-      metalGrad.addColorStop(1, p.color)
-      ctx.fillStyle = metalGrad
+      ctx.fillStyle = p.color
       ctx.fill()
       
-      // Inner highlight
-      ctx.globalAlpha = 0.4 * shimmer
+      // Simple highlight
+      ctx.globalAlpha = shimmer * 0.3
       ctx.beginPath()
-      ctx.moveTo(0, -size * 0.5)
-      ctx.lineTo(size * 0.3, 0)
-      ctx.lineTo(0, size * 0.3)
-      ctx.lineTo(-size * 0.3, 0)
+      ctx.moveTo(0, -size * 0.4)
+      ctx.lineTo(size * 0.2, 0)
+      ctx.lineTo(0, size * 0.2)
+      ctx.lineTo(-size * 0.2, 0)
       ctx.closePath()
       ctx.fillStyle = '#ffffff'
       ctx.fill()
@@ -363,26 +388,45 @@ function CrystallineBackground() {
       ctx.stroke()
     }
 
-    const animate = () => {
-      timeRef.current += 0.014
+    // OPTIMIZED: Frame rate limiting and visibility API
+    const animate = (timestamp: number) => {
+      // Skip if tab is hidden
+      if (!isVisibleRef.current) return
+      
+      // Frame rate limiting
+      const elapsed = timestamp - lastFrameTimeRef.current
+      if (elapsed < frameInterval) {
+        animationRef.current = requestAnimationFrame(animate)
+        return
+      }
+      lastFrameTimeRef.current = timestamp - (elapsed % frameInterval)
+      
+      // Update FPS and adapt quality
+      const fps = fpsMonitorRef.current.update()
+      const skipExpensive = fps < 20 // Skip expensive operations if FPS drops
+      
+      timeRef.current += 0.012
       const time = timeRef.current
-      ctx.fillStyle = 'rgba(6, 6, 12, 0.06)'
+      ctx.fillStyle = 'rgba(6, 6, 12, 0.04)'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-      laserBeamsRef.current.forEach(b => {
-        b.x += Math.cos(b.angle) * b.speed
-        b.y += Math.sin(b.angle) * b.speed
-        b.angle += 0.0008
-        if (b.x < -80) b.x = canvas.width + 80
-        if (b.x > canvas.width + 80) b.x = -80
-        if (b.y < -80) b.y = canvas.height + 80
-        if (b.y > canvas.height + 80) b.y = -80
-        drawLaserBeam(b, time)
-      })
+      // Skip lasers if FPS is too low
+      if (!skipExpensive) {
+        laserBeamsRef.current.forEach(b => {
+          b.x += Math.cos(b.angle) * b.speed
+          b.y += Math.sin(b.angle) * b.speed
+          b.angle += 0.0006
+          if (b.x < -80) b.x = canvas.width + 80
+          if (b.x > canvas.width + 80) b.x = -80
+          if (b.y < -80) b.y = canvas.height + 80
+          if (b.y > canvas.height + 80) b.y = -80
+          drawLaserBeam(b, time)
+        })
+      }
 
       woodParticlesRef.current.forEach(p => {
-        p.y += 0.04
-        p.x += Math.sin(time * 0.04 + p.drift) * 0.08
+        p.y += 0.03
+        p.x += Math.sin(time * 0.03 + p.drift) * 0.05
         if (p.y > canvas.height + 15) { p.y = -15; p.x = Math.random() * canvas.width }
         drawWoodParticle(p, time)
       })
@@ -395,46 +439,55 @@ function CrystallineBackground() {
         if (org.x > canvas.width + org.size) org.x = -org.size
         if (org.y < -org.size) org.y = canvas.height + org.size
         if (org.y > canvas.height + org.size) org.y = -org.size
-        if (Math.random() < 0.004) {
-          org.vx += (Math.random() - 0.5) * 0.08
-          org.vy += (Math.random() - 0.5) * 0.08
-          org.vx = Math.max(-0.4, Math.min(0.4, org.vx))
-          org.vy = Math.max(-0.4, Math.min(0.4, org.vy))
+        if (Math.random() < 0.002) {
+          org.vx += (Math.random() - 0.5) * 0.05
+          org.vy += (Math.random() - 0.5) * 0.05
+          org.vx = Math.max(-0.3, Math.min(0.3, org.vx))
+          org.vy = Math.max(-0.3, Math.min(0.3, org.vy))
         }
         drawMicroorganism(org, time)
       })
 
-      // Metallic particles - subtle shimmering accents
-      metallicParticlesRef.current.forEach(p => {
-        p.x += p.vx
-        p.y += p.vy
-        p.rotation += p.rotationSpeed
-        if (p.x < -p.size) p.x = canvas.width + p.size
-        if (p.x > canvas.width + p.size) p.x = -p.size
-        if (p.y < -p.size) p.y = canvas.height + p.size
-        if (p.y > canvas.height + p.size) p.y = -p.size
-        if (Math.random() < 0.003) {
-          p.vx += (Math.random() - 0.5) * 0.05
-          p.vy += (Math.random() - 0.5) * 0.05
-          p.vx = Math.max(-0.2, Math.min(0.2, p.vx))
-          p.vy = Math.max(-0.2, Math.min(0.2, p.vy))
-        }
-        drawMetallicParticle(p, time)
-      })
+      // Skip metallic particles if FPS is too low
+      if (!skipExpensive) {
+        metallicParticlesRef.current.forEach(p => {
+          p.x += p.vx
+          p.y += p.vy
+          p.rotation += p.rotationSpeed
+          if (p.x < -p.size) p.x = canvas.width + p.size
+          if (p.x > canvas.width + p.size) p.x = -p.size
+          if (p.y < -p.size) p.y = canvas.height + p.size
+          if (p.y > canvas.height + p.size) p.y = -p.size
+          if (Math.random() < 0.002) {
+            p.vx += (Math.random() - 0.5) * 0.03
+            p.vy += (Math.random() - 0.5) * 0.03
+            p.vx = Math.max(-0.15, Math.min(0.15, p.vx))
+            p.vy = Math.max(-0.15, Math.min(0.15, p.vy))
+          }
+          drawMetallicParticle(p, time)
+        })
 
-      createLightning()
-      lightningsRef.current = lightningsRef.current.filter(l => {
-        l.life++
-        if (l.life < l.maxLife) { drawLightning(l); return true }
-        return false
-      })
+        createLightning()
+        lightningsRef.current = lightningsRef.current.filter(l => {
+          l.life++
+          if (l.life < l.maxLife) { drawLightning(l); return true }
+          return false
+        })
+      }
 
       drawPetriDish()
       animationRef.current = requestAnimationFrame(animate)
     }
 
-    animate()
-    return () => { cancelAnimationFrame(animationRef.current); window.removeEventListener('resize', resizeCanvas) }
+    lastFrameTimeRef.current = performance.now()
+    animationRef.current = requestAnimationFrame(animate)
+    
+    return () => { 
+      cancelAnimationFrame(animationRef.current)
+      window.removeEventListener('resize', handleResize)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      clearTimeout(resizeTimeout)
+    }
   }, [])
 
   return (
