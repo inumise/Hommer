@@ -162,40 +162,42 @@ function App() {
 
   return (
     <ThemeProvider>
-      {/* Sacred Loading Screen */}
+      {/* Sacred Loading Screen - shows until content is ready */}
       {isLoading && (
         <LoadingScreen onLoadComplete={handleLoadComplete} />
       )}
       
-      {/* Main Content - with fade-in transition */}
-      <div 
-        ref={mainRef} 
-        className="relative min-h-screen bg-black text-white overflow-x-hidden transition-opacity duration-500"
-        style={{ opacity: showContent ? 1 : 0 }}
-      >
-        <Scene3D />
-        <AccessibilityMenu />
-        <Navigation currentPage={currentPage} onPageChange={setCurrentPage} />
-        <LeftSideMenu />
-        
-        <div className="relative z-10 pt-24">
-          {renderPage()}
-        </div>
-
-        {/* Scroll progress bar - only show on main page */}
-        {currentPage === 'main' && (
-          <div className="fixed top-24 left-0 w-full h-1 z-30">
-            <div 
-              className="h-full bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500"
-              style={{
-                width: '0%',
-                transition: 'width 0.1s ease-out'
-              }}
-              id="scroll-progress"
-            />
+      {/* Main Content - only render after loading complete for instant first frame */}
+      {showContent && (
+        <div 
+          ref={mainRef} 
+          className="relative min-h-screen bg-black text-white overflow-x-hidden animate-fadeIn"
+        >
+          {/* Scene3D only renders after loading - prevents competing with initial render */}
+          <Scene3D />
+          <AccessibilityMenu />
+          <Navigation currentPage={currentPage} onPageChange={setCurrentPage} />
+          <LeftSideMenu />
+          
+          <div className="relative z-10 pt-24">
+            {renderPage()}
           </div>
-        )}
-      </div>
+
+          {/* Scroll progress bar - only show on main page */}
+          {currentPage === 'main' && (
+            <div className="fixed top-24 left-0 w-full h-1 z-30">
+              <div 
+                className="h-full bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500"
+                style={{
+                  width: '0%',
+                  transition: 'width 0.1s ease-out'
+                }}
+                id="scroll-progress"
+              />
+            </div>
+          )}
+        </div>
+      )}
     </ThemeProvider>
   )
 }

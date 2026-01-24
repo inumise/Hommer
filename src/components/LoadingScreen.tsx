@@ -1,8 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTheme } from '../contexts/ThemeContext'
-
-// Sacred symbols from The Sense
-const sacredSymbols = ['॥वात॥', '॥पित्त॥', '॥कफ॥', '☉', '☽', '⊕', '✧', '∞', '🍄', '🍎', '🌿', '💧', '🔮']
 
 // Cryptic loading phrases
 const loadingPhrases = [
@@ -11,9 +8,6 @@ const loadingPhrases = [
   'Aligning cosmic frequencies...',
   'Loading ancient wisdom...',
   'Preparing the hidden knowledge...',
-  'Synchronizing with the universe...',
-  'Opening the gateway...',
-  'Gathering sacred elements...',
 ]
 
 interface LoadingScreenProps {
@@ -21,155 +15,85 @@ interface LoadingScreenProps {
   assetsToPreload?: string[]
 }
 
+// OPTIMIZED: Simplified loading screen - no canvas animation to compete with initial render
 export default function LoadingScreen({ onLoadComplete, assetsToPreload = [] }: LoadingScreenProps) {
   const { colors } = useTheme()
   const [progress, setProgress] = useState(0)
   const [currentPhrase, setCurrentPhrase] = useState(loadingPhrases[0])
-  const [symbolPositions, setSymbolPositions] = useState<{ x: number; y: number; symbol: string; delay: number }[]>([])
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const animationRef = useRef<number>(0)
-  const startTimeRef = useRef<number>(Date.now())
+  const phraseIndexRef = useRef(0)
 
-  // Initialize symbol positions
-  useEffect(() => {
-    const positions = sacredSymbols.map((symbol, i) => ({
-      x: 10 + Math.random() * 80,
-      y: 10 + Math.random() * 80,
-      symbol,
-      delay: i * 0.2
-    }))
-    setSymbolPositions(positions)
-  }, [])
-
-  // Rotate loading phrases
+  // Rotate loading phrases - simple interval, no heavy computation
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentPhrase(loadingPhrases[Math.floor(Math.random() * loadingPhrases.length)])
-    }, 2000)
+      phraseIndexRef.current = (phraseIndexRef.current + 1) % loadingPhrases.length
+      setCurrentPhrase(loadingPhrases[phraseIndexRef.current])
+    }, 1500)
     return () => clearInterval(interval)
   }, [])
 
-  // Draw mystical connection lines on canvas
-  const drawConnections = useCallback(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    const time = (Date.now() - startTimeRef.current) / 1000
-    
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    
-    // Draw flowing connection lines
-    symbolPositions.forEach((pos1, i) => {
-      symbolPositions.forEach((pos2, j) => {
-        if (i >= j) return
-        
-        const x1 = (pos1.x / 100) * canvas.width
-        const y1 = (pos1.y / 100) * canvas.height
-        const x2 = (pos2.x / 100) * canvas.width
-        const y2 = (pos2.y / 100) * canvas.height
-        
-        const distance = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-        if (distance > canvas.width * 0.4) return
-        
-        const opacity = Math.sin(time * 2 + i + j) * 0.3 + 0.3
-        
-        ctx.beginPath()
-        ctx.moveTo(x1, y1)
-        
-        // Curved connection
-        const midX = (x1 + x2) / 2 + Math.sin(time + i) * 30
-        const midY = (y1 + y2) / 2 + Math.cos(time + j) * 30
-        ctx.quadraticCurveTo(midX, midY, x2, y2)
-        
-        const gradient = ctx.createLinearGradient(x1, y1, x2, y2)
-        gradient.addColorStop(0, `${colors.primary}${Math.floor(opacity * 255).toString(16).padStart(2, '0')}`)
-        gradient.addColorStop(0.5, `${colors.secondary}${Math.floor(opacity * 255).toString(16).padStart(2, '0')}`)
-        gradient.addColorStop(1, `${colors.primary}${Math.floor(opacity * 255).toString(16).padStart(2, '0')}`)
-        
-        ctx.strokeStyle = gradient
-        ctx.lineWidth = 1
-        ctx.stroke()
-      })
-    })
-    
-    animationRef.current = requestAnimationFrame(drawConnections)
-  }, [symbolPositions, colors])
-
-  // Start canvas animation
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    
-    const resize = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
-    }
-    resize()
-    window.addEventListener('resize', resize)
-    
-    animationRef.current = requestAnimationFrame(drawConnections)
-    
-    return () => {
-      window.removeEventListener('resize', resize)
-      cancelAnimationFrame(animationRef.current)
-    }
-  }, [drawConnections])
-
-  // Preload assets and track progress
+  // Fast loading - minimal delays, just preload fonts
   useEffect(() => {
     const preloadAssets = async () => {
-      const totalAssets = assetsToPreload.length + 10 // +10 for simulated loading steps
       let loaded = 0
+      const totalSteps = 5 // Reduced from 10 for faster loading
 
-      // Preload images
-      const imagePromises = assetsToPreload
-        .filter(url => /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url))
-        .map(url => new Promise<void>((resolve) => {
-          const img = new Image()
-          img.onload = () => {
-            loaded++
-            setProgress((loaded / totalAssets) * 100)
-            resolve()
-          }
-          img.onerror = () => {
-            loaded++
-            setProgress((loaded / totalAssets) * 100)
-            resolve()
-          }
-          img.src = url
-        }))
-
-      // Preload fonts
+      // Preload fonts first (critical)
       if (document.fonts) {
         try {
-          await document.fonts.load('1em "Space Grotesk"')
-          await document.fonts.load('1em "Orbitron"')
-        } catch (e) {
-          console.log('Font preload skipped')
+          await Promise.race([
+            document.fonts.load('1em "Space Grotesk"'),
+            new Promise(resolve => setTimeout(resolve, 500)) // Timeout after 500ms
+          ])
+          loaded++
+          setProgress((loaded / totalSteps) * 100)
+          
+          await Promise.race([
+            document.fonts.load('1em "Orbitron"'),
+            new Promise(resolve => setTimeout(resolve, 500))
+          ])
+          loaded++
+          setProgress((loaded / totalSteps) * 100)
+        } catch {
+          loaded += 2
+          setProgress((loaded / totalSteps) * 100)
         }
+      } else {
+        loaded += 2
+        setProgress((loaded / totalSteps) * 100)
       }
 
-      // Simulated loading steps for heavy components
-      const simulatedSteps = 10
-      for (let i = 0; i < simulatedSteps; i++) {
-        await new Promise(resolve => setTimeout(resolve, 150))
+      // Preload images if any
+      if (assetsToPreload.length > 0) {
+        const imagePromises = assetsToPreload
+          .filter(url => /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url))
+          .map(url => new Promise<void>((resolve) => {
+            const img = new Image()
+            img.onload = () => resolve()
+            img.onerror = () => resolve()
+            img.src = url
+          }))
+        await Promise.race([
+          Promise.all(imagePromises),
+          new Promise(resolve => setTimeout(resolve, 1000)) // Max 1s for images
+        ])
+      }
+      loaded++
+      setProgress((loaded / totalSteps) * 100)
+
+      // Quick simulated steps (reduced delay)
+      for (let i = 0; i < 2; i++) {
+        await new Promise(resolve => setTimeout(resolve, 100))
         loaded++
-        setProgress((loaded / totalAssets) * 100)
+        setProgress((loaded / totalSteps) * 100)
       }
-
-      await Promise.all(imagePromises)
       
-      // Final delay for smooth transition
-      await new Promise(resolve => setTimeout(resolve, 500))
+      // Complete immediately
       setProgress(100)
       
-      // Wait a bit before completing
+      // Minimal delay before completing - just enough for visual feedback
       setTimeout(() => {
         onLoadComplete()
-      }, 800)
+      }, 200)
     }
 
     preloadAssets()
@@ -182,48 +106,33 @@ export default function LoadingScreen({ onLoadComplete, assetsToPreload = [] }: 
         background: `radial-gradient(ellipse at center, ${colors.surface}, ${colors.background})`,
       }}
     >
-      {/* Mystical connection canvas */}
-      <canvas 
-        ref={canvasRef}
-        className="absolute inset-0 pointer-events-none"
+      {/* Simple CSS-only decorative elements - no canvas for fast first paint */}
+      <div 
+        className="absolute inset-0 opacity-20"
+        style={{
+          background: `
+            radial-gradient(circle at 20% 30%, ${colors.primary}30 0%, transparent 40%),
+            radial-gradient(circle at 80% 70%, ${colors.secondary}30 0%, transparent 40%),
+            radial-gradient(circle at 50% 50%, ${colors.primary}20 0%, transparent 50%)
+          `
+        }}
       />
-      
-      {/* Floating sacred symbols */}
-      {symbolPositions.map((pos, i) => (
-        <div
-          key={i}
-          className="absolute text-2xl sm:text-3xl animate-pulse pointer-events-none"
-          style={{
-            left: `${pos.x}%`,
-            top: `${pos.y}%`,
-            transform: 'translate(-50%, -50%)',
-            color: colors.primary,
-            opacity: 0.4 + Math.sin(Date.now() / 1000 + pos.delay) * 0.3,
-            filter: `drop-shadow(0 0 10px ${colors.primary})`,
-            animationDelay: `${pos.delay}s`,
-            transition: 'opacity 0.5s ease'
-          }}
-        >
-          {pos.symbol}
-        </div>
-      ))}
       
       {/* Center content */}
       <div className="relative z-10 text-center px-4">
-        {/* Central eye symbol */}
+        {/* Central symbol - CSS animation only */}
         <div 
-          className="w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-8 rounded-full flex items-center justify-center animate-pulse"
+          className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-6 rounded-full flex items-center justify-center"
           style={{
             background: `radial-gradient(circle, ${colors.primary}30, transparent)`,
             border: `2px solid ${colors.primary}50`,
-            boxShadow: `0 0 60px ${colors.primary}40, inset 0 0 30px ${colors.primary}20`
+            boxShadow: `0 0 40px ${colors.primary}30`,
+            animation: 'pulse 2s ease-in-out infinite'
           }}
         >
           <span 
-            className="text-4xl sm:text-5xl"
-            style={{ 
-              filter: `drop-shadow(0 0 20px ${colors.primary})`,
-            }}
+            className="text-3xl sm:text-4xl"
+            style={{ color: colors.primary }}
           >
             ॐ
           </span>
@@ -231,14 +140,12 @@ export default function LoadingScreen({ onLoadComplete, assetsToPreload = [] }: 
         
         {/* Title */}
         <h1 
-          className="text-2xl sm:text-4xl font-bold mb-4"
+          className="text-xl sm:text-3xl font-bold mb-3"
           style={{ 
-            background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary}, ${colors.primary})`,
-            backgroundSize: '200% 200%',
+            background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
-            animation: 'gradientShift 3s ease infinite'
           }}
         >
           Entering The Hidden Realm
@@ -246,7 +153,7 @@ export default function LoadingScreen({ onLoadComplete, assetsToPreload = [] }: 
         
         {/* Loading phrase */}
         <p 
-          className="text-sm sm:text-base font-mono mb-8 transition-all duration-500"
+          className="text-sm font-mono mb-6"
           style={{ color: colors.textMuted }}
         >
           {currentPhrase}
@@ -254,15 +161,14 @@ export default function LoadingScreen({ onLoadComplete, assetsToPreload = [] }: 
         
         {/* Progress bar */}
         <div 
-          className="w-64 sm:w-80 h-1 mx-auto rounded-full overflow-hidden mb-4"
+          className="w-56 sm:w-72 h-1 mx-auto rounded-full overflow-hidden mb-3"
           style={{ background: `${colors.border}50` }}
         >
           <div 
-            className="h-full rounded-full transition-all duration-300 ease-out"
+            className="h-full rounded-full transition-all duration-200 ease-out"
             style={{ 
               width: `${progress}%`,
               background: colors.gradient,
-              boxShadow: `0 0 20px ${colors.primary}`
             }}
           />
         </div>
@@ -274,21 +180,13 @@ export default function LoadingScreen({ onLoadComplete, assetsToPreload = [] }: 
         >
           {Math.round(progress)}%
         </p>
-        
-        {/* Cryptic footer text */}
-        <p 
-          className="text-xs font-mono mt-8 tracking-widest opacity-50"
-          style={{ color: colors.textMuted }}
-        >
-          [ This knowledge is prohibited to those who seek without reverence ]
-        </p>
       </div>
       
-      {/* CSS for gradient animation */}
+      {/* CSS for pulse animation */}
       <style>{`
-        @keyframes gradientShift {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.05); opacity: 0.8; }
         }
       `}</style>
     </div>

@@ -435,6 +435,16 @@ body {
   will-change: transform;
 }
 
+/* Fade in animation for main content after loading */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
 .reduce-motion {
   animation-duration: 0.01ms !important;
   animation-iteration-count: 1 !important;
