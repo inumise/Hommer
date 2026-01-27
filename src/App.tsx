@@ -6,6 +6,7 @@ import Scene3D from './components/Scene3D'
 import HeroSection from './components/HeroSection'
 import AboutSection from './components/AboutSection'
 import NewAgeTech from './components/NewAgeTech'
+import FinishedFeelings from './components/FinishedFeelings'
 import TechShowcase from './components/TechShowcase'
 import WebServices from './components/WebServices'
 import PricingSection from './components/PricingSection'
@@ -77,6 +78,7 @@ function MainPage() {
     <>
       <HeroSection />
       <AboutSection />
+      <FinishedFeelings />
       <NewAgeTech />
       <TechShowcase />
       <WebServices />
