@@ -175,23 +175,23 @@ function SacredNode({
       }}
       onClick={onActivate}
     >
-      {/* Glow effect */}
+      {/* Glow effect - softened and cinematic */}
       <div 
-        className="absolute inset-0 rounded-full blur-xl transition-opacity duration-500"
+        className="absolute inset-0 rounded-full blur-2xl transition-opacity duration-700"
         style={{
           background: element.color,
-          opacity: isActive ? 0.7 : 0.3,
-          transform: `scale(${2.5 + burstIntensity * 0.5})`
+          opacity: isActive ? 0.4 : 0.15,
+          transform: `scale(${2.8 + burstIntensity * 0.3})`
         }}
       />
       
-      {/* Pulsing ring */}
+      {/* Pulsing ring - much subtler and slower */}
       <div 
         className="absolute inset-0 rounded-full pointer-events-none"
         style={{
-          border: `2px solid ${element.color}`,
-          opacity: 0.3 + Math.sin(nodeState.phase) * 0.2,
-          transform: `scale(${1.6 + Math.sin(nodeState.phase * 2) * 0.3})`
+          border: `1.5px solid ${element.color}`,
+          opacity: 0.2 + Math.sin(nodeState.phase) * 0.12,
+          transform: `scale(${1.6 + Math.sin(nodeState.phase * 1.2) * 0.2})`
         }}
       />
       
@@ -199,19 +199,19 @@ function SacredNode({
       <div
         className="relative w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full flex flex-col items-center justify-center transition-all duration-300"
         style={{
-          background: `radial-gradient(circle at 30% 30%, ${element.color}60, ${element.color}20)`,
-          border: `2px solid ${isActive ? element.color : element.color + '80'}`,
+          background: `radial-gradient(circle at 30% 30%, ${element.color}50, ${element.color}15)`,
+          border: `2px solid ${isActive ? element.color : element.color + '70'}`,
           boxShadow: isActive 
-            ? `0 0 50px ${element.color}90, inset 0 0 25px ${element.color}40` 
-            : `0 0 20px ${element.color}40`,
-          transform: isActive ? 'scale(1.35)' : 'scale(1)'
+            ? `0 0 40px ${element.color}70, inset 0 0 20px ${element.color}30` 
+            : `0 0 15px ${element.color}30`,
+          transform: isActive ? 'scale(1.25)' : 'scale(1)'
         }}
       >
         <span 
           className="text-base md:text-lg lg:text-xl mb-0.5" 
           style={{ 
-            filter: `drop-shadow(0 0 10px ${element.color})`,
-            transform: `rotate(${Math.sin(nodeState.phase * 0.5) * 8}deg)`
+            filter: `drop-shadow(0 0 8px ${element.color})`,
+            transform: `rotate(${Math.sin(nodeState.phase * 0.3) * 5}deg)`
           }}
         >
           {element.symbol}
@@ -317,11 +317,11 @@ export default function SensePage() {
       lastTime = currentTime
       timeRef.current = currentTime
 
-      // Random burst every 4-8 seconds
-      if (currentTime - lastBurstRef.current > 4000 + Math.random() * 4000) {
-        setBurstIntensity(1)
+      // Random burst every 8-14 seconds - much slower, more cinematic
+      if (currentTime - lastBurstRef.current > 8000 + Math.random() * 6000) {
+        setBurstIntensity(0.6)
         lastBurstRef.current = currentTime
-        setTimeout(() => setBurstIntensity(0), 600)
+        setTimeout(() => setBurstIntensity(0), 1200)
       }
 
       setNodeStates(prev => {
@@ -329,9 +329,9 @@ export default function SensePage() {
         Object.keys(newStates).forEach(id => {
           const state = newStates[id]
           
-          // Update phase for pulsing
-          state.phase += deltaTime * 2.5
-          state.burstPhase += deltaTime * 4
+          // Update phase for pulsing - much slower for cinematic feel
+          state.phase += deltaTime * 0.8
+          state.burstPhase += deltaTime * 1.2
           
           // Random velocity changes - more frequent
           if (Math.random() < 0.04) {
@@ -407,36 +407,36 @@ export default function SensePage() {
         ctx.moveTo(x1, y1)
         ctx.quadraticCurveTo(midX + perpX, midY + perpY, x2, y2)
         
-        // Gradient based on element colors
+        // Gradient based on element colors - softer
         const gradient = ctx.createLinearGradient(x1, y1, x2, y2)
-        gradient.addColorStop(0, isActiveConnection ? `${element.color}a0` : `${element.color}35`)
-        gradient.addColorStop(1, isActiveConnection ? `${connElement.color}a0` : `${connElement.color}35`)
+        gradient.addColorStop(0, isActiveConnection ? `${element.color}80` : `${element.color}20`)
+        gradient.addColorStop(1, isActiveConnection ? `${connElement.color}80` : `${connElement.color}20`)
         
         ctx.strokeStyle = gradient
-        ctx.lineWidth = isActiveConnection ? 3.5 - avgDepth * 0.3 : 2 - avgDepth * 0.2
+        ctx.lineWidth = isActiveConnection ? 2.8 - avgDepth * 0.2 : 1.2 - avgDepth * 0.1
         ctx.stroke()
 
-        // Animated particles on connections
-        if (isActiveConnection || Math.random() < 0.008) {
-          const numParticles = isActiveConnection ? 4 : 1
+        // Animated particles on connections - slower and softer
+        if (isActiveConnection || Math.random() < 0.004) {
+          const numParticles = isActiveConnection ? 3 : 1
           for (let p = 0; p < numParticles; p++) {
-            const t = ((time * 0.4 + p * 0.25) % 1)
+            const t = ((time * 0.2 + p * 0.33) % 1)
             // Quadratic bezier point calculation
             const mt = 1 - t
             const px = mt * mt * x1 + 2 * mt * t * (midX + perpX) + t * t * x2
             const py = mt * mt * y1 + 2 * mt * t * (midY + perpY) + t * t * y2
             
             ctx.beginPath()
-            ctx.arc(px, py, isActiveConnection ? 5 : 3, 0, Math.PI * 2)
+            ctx.arc(px, py, isActiveConnection ? 3.5 : 2, 0, Math.PI * 2)
             const particleColor = t < 0.5 ? element.color : connElement.color
             ctx.fillStyle = particleColor
             ctx.fill()
             
-            // Glow effect on particles
+            // Glow effect on particles - subtler
             if (isActiveConnection) {
               ctx.beginPath()
-              ctx.arc(px, py, 10, 0, Math.PI * 2)
-              ctx.fillStyle = `${particleColor}30`
+              ctx.arc(px, py, 8, 0, Math.PI * 2)
+              ctx.fillStyle = `${particleColor}15`
               ctx.fill()
             }
           }
